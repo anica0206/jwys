@@ -1,4 +1,4 @@
-const db = require('../db');
+const db = require('../../dbRoutes');
 
 exports.getUser = async (id, password) => {
     const result = await db.query(

@@ -1,4 +1,4 @@
-const userQueries = require('../db/usersQueries');
+const userQueries = require('../db/queries/userQueries');
 
 exports.getAllUsers = async (req, res) => {
   try {

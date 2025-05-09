@@ -1,4 +1,4 @@
-// server/db.js
+// server/dbRoutes.js
 require('dotenv').config();        // .env 로드
 const { Pool } = require('pg');    // pg 모듈 사용 예시
 

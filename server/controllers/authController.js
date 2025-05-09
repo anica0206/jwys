@@ -1,4 +1,4 @@
-const authQuery = require('../db/authQuery');
+const authQuery = require('../db/queries/authQueries');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
