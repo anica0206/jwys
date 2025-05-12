@@ -1,10 +1,10 @@
 // src/App.js
 import React, { useEffect, useState } from 'react';
-import { login } from './auth.api'; // api 분리
+import { login } from '../../api/authApi'; // api 분리
 import { Link, useNavigate } from 'react-router-dom';
 
 const Login = () => {
-    const [users, setUsers] = useState([]);
+    // const [users, setUsers] = useState([]);
     const [id, setId] = useState(localStorage.getItem('id') || '');
     const [password, setPassword] = useState('');
     const [rememberMe, setRememberMe] = useState(false); // 아이디 저장 체크 상태
