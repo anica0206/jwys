@@ -1,6 +1,6 @@
 // src/App.js
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { login } from './auth.api'; // api 분리
 import { Link, useNavigate } from 'react-router-dom';
 
 const Login = () => {
@@ -11,42 +11,30 @@ const Login = () => {
     const navigate = useNavigate();
 
     const handleLogin = async () => {
-      try {
-        const res = await axios.post('http://localhost:5000/api/auth/login', {
-          id: id,
-          password: password
-        });
+        try {
+            const res = await login(id, password);
+            // 로그인 성공 후 사용자 정보 출력
+            console.log('로그인 성공:', res.data);
 
-        localStorage.setItem('token', res.data.token);
+            localStorage.setItem('token', res.data.token);
 
-        if (rememberMe) {
-            localStorage.setItem('id', id); // 아이디 저장
-        } else {
-            localStorage.removeItem('id'); // 아이디 저장 안함
-        }
-        navigate('/dashboard');
-        
-      } catch (err) {
-        console.error('로그인 실패:', err.response.data.message);
-      }
-    };
+            if (rememberMe) {
+                localStorage.setItem('id', id); // 아이디 저장
+            } else {
+                localStorage.removeItem('id'); // 아이디 저장 안함
+            }
+            navigate('/dashboard');
 
-    useEffect(() => {
-        axios.get('http://localhost:5000/api/users')
-            .then(response => {
-                console.log(response.data);
-                setUsers(response.data);
-            })
-            .catch(error => {
-                console.error("There was an error fetching the users!", error);
-            });
-    }, []);
+          } catch (err) {
+            console.error('로그인 실패:', err.response.data.message);
+          }
+        };
 
     return (
       <section className="min-h-screen flex items-center">
         <div className="mx-auto max-w-screen-xl px-4 py-8 sm:px-6 lg:px-8 w-full">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-5 md:items-center md:gap-8">
-            
+
             {/* 이미지 */}
             <div className="md:col-span-3">
               <img

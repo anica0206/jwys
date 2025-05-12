@@ -1,9 +1,9 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { UserProvider } from './context/UserContext';
-import Login from './pages/account/Login';
-import Signup from './pages/account/Signup';
-import Main from './pages/dashboard/main';
+import Login from './pages/Auth/Login';
+import Signup from './pages/Auth/Signup';
+import Main from './pages/dashboard/Main';
 
 const App = () => {
   return (
