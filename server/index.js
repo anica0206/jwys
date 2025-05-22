@@ -12,3 +12,7 @@ const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
 
 app.listen(5000, () => console.log('Server running on port 5000'));
+
+console.log('DB_PASS:', process.env.DB_PASS);
+console.log('type:', typeof process.env.DB_PASS);
+
