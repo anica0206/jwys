@@ -26,7 +26,7 @@ const Login = () => {
             navigate('/dashboard');
 
           } catch (err) {
-            console.error('로그인 실패:', err.response.data.message);
+            console.error('로그인 실패:', err.res.data.message);
           }
         };
 
