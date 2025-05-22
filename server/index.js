@@ -1,6 +1,3 @@
-require('dotenv').config();
-console.log('DB_PASS:', typeof process.env.DB_PASS, process.env.DB_PASS);
-
 const express = require('express');
 const app = express();
 const cors = require('cors');
