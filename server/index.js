@@ -4,9 +4,6 @@ console.log('DB_PASS from env:', process.env.DB_PASS);
 console.log('DB_USER:', process.env.DB_USER);
 console.log('DB_PASS:', process.env.DB_PASS);
 
-
-main();
-
 const express = require('express');
 const app = express();
 const cors = require('cors');
