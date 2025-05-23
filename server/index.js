@@ -1,17 +1,21 @@
 require('dotenv').config();
-console.log('DB_PASS from env:', process.env.DB_PASS);
-console.log('DB_USER:', process.env.DB_USER);
-console.log('DB_PASS:', process.env.DB_PASS);
-try {
-    console.log('Query:', queryText);
-    console.log('Params:', params);
-    const res = await client.query(queryText, params);
-    console.log('Result:', res.rows);
-} catch (error) {
-    console.error('Query error:', error);
+
+async function main() {
+    console.log('DB_PASS from env:', process.env.DB_PASS);
+    console.log('DB_USER:', process.env.DB_USER);
+    console.log('DB_PASS:', process.env.DB_PASS);
+
+    try {
+        console.log('Query:', queryText);
+        console.log('Params:', params);
+        const res = await client.query(queryText, params);
+        console.log('Result:', res.rows);
+    } catch (error) {
+        console.error('Query error:', error);
+    }
 }
 
-
+main();
 
 const express = require('express');
 const app = express();
@@ -30,4 +34,3 @@ app.listen(5000, () => console.log('Server running on port 5000'));
 
 console.log('DB_PASS:', process.env.DB_PASS);
 console.log('type:', typeof process.env.DB_PASS);
-
