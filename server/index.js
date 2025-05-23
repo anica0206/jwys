@@ -2,6 +2,15 @@ require('dotenv').config();
 console.log('DB_PASS from env:', process.env.DB_PASS);
 console.log('DB_USER:', process.env.DB_USER);
 console.log('DB_PASS:', process.env.DB_PASS);
+try {
+    console.log('Query:', queryText);
+    console.log('Params:', params);
+    const res = await client.query(queryText, params);
+    console.log('Result:', res.rows);
+} catch (error) {
+    console.error('Query error:', error);
+}
+
 
 
 const express = require('express');
