@@ -11,24 +11,24 @@ const Login = () => {
     const navigate = useNavigate();
 
     const handleLogin = async () => {
-        try {
-            const res = await login(id, password);
-            // 로그인 성공 후 사용자 정보 출력
-            console.log('로그인 성공:', res.data);
+      try {
+        const res = await login(id, password);
+        // 로그인 성공 후 사용자 정보 출력
+        console.log('로그인 성공:', res.data);
 
-            localStorage.setItem('token', res.data.token);
+        localStorage.setItem('token', res.data.token);
 
-            if (rememberMe) {
-                localStorage.setItem('id', id); // 아이디 저장
-            } else {
-                localStorage.removeItem('id'); // 아이디 저장 안함
-            }
-            navigate('/dashboard');
+        if (rememberMe) {
+            localStorage.setItem('id', id); // 아이디 저장
+        } else {
+            localStorage.removeItem('id'); // 아이디 저장 안함
+        }
+        navigate('/dashboard');
 
-          } catch (err) {
-            console.error('로그인 실패:', err.res.data.message);
-          }
-        };
+      } catch (err) {
+          console.error('로그인 실패:', err.res.data.message);
+      }
+    };
 
     return (
       <section className="min-h-screen flex items-center">

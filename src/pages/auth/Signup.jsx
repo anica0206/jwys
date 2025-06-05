@@ -1,5 +1,6 @@
 import React from 'react';
 import { useState } from "react";
+import { signUp } from '../../api/signUpApi';
 
 const steps = [
   { id: 1, label: '기본 정보' },
@@ -10,7 +11,7 @@ const steps = [
 const SignupPage = () => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    name: '',
+    id: '',
     email: '',
     phone: '',
     password: '',
@@ -21,12 +22,26 @@ const SignupPage = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const nextStep = () => setStep((prev) => Math.min(prev + 1, steps.length));
+  const nextStep = () => {setStep((prev) => Math.min(prev + 1, steps.length)); console.log(formData);}
   const prevStep = () => setStep((prev) => Math.max(prev - 1, 1));
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('회원가입 완료:', formData);
+  // const handleSubmit = async(e) => {
+  //   e.preventDefault();
+
+  //   try {
+  //     const res = await signUp(formData.id, formData.email, formData.password);
+  //     console.log('회원가입 성공', res.data);
+  //   } catch (err) {
+  //       console.error('로그인 실패:', err.res.data.message);
+  //   }
+  // };
+  const handleSubmit = async() => {
+    try {
+      const res = await signUp(formData.id, formData.email, formData.password);
+      console.log('회원가입 성공', res.data);
+    } catch (err) {
+        console.error('로그인 실패:', err.res.data.message);
+    }
   };
 
   const renderStepContent = () => {
@@ -35,11 +50,11 @@ const SignupPage = () => {
         <>
           <input
             type="text"
-            name="name"
-            placeholder="이름"
-            value={formData.name}
+            name="id"
+            placeholder="아이디"
+            value={formData.id}
             onChange={handleChange}
-            className="w-full p-2 border rounded mb-4"
+            className="w-1/2 p-2 border rounded mb-4"
           />
           <input
             type="email"
@@ -102,67 +117,70 @@ const SignupPage = () => {
       </div>
 
       {/* Right section with form and stepper */}
-      <div className="md:w-1/2 bg-white p-8">
-        <div className="overflow-hidden relative h-24 mb-8">
-          <div
-            className="transition-transform duration-500"
-            style={{
-              transform: `translateX(calc(50% - ${(step - 1) * 96 + 48}px))`,
-            }}
-          >
-            <div className="flex px-4 w-fit space-x-8">
-              {steps.map((s) => (
-                <div key={s.id} className="flex flex-col items-center w-16">
-                  <div
-                    className={`w-8 h-8 rounded-full border-2 flex items-center justify-center mb-1 text-sm
-                      ${s.id === step
-                        ? 'bg-blue-500 border-blue-500 text-white'
-                        : 'bg-white border-gray-300 text-gray-400'}`}
-                  >
-                    {s.id}
+      <div className="md:w-1/2 bg-white p-8 flex flex-col h-screen">
+        <div className="flex-1 flex flex-col justify-start md:justify-center">
+          <div className="flex justify-center mb-8 mt-4 md:mt-0">
+            <div
+              className="transition-transform duration-500"
+              style={{
+                transform: `translateX(calc(50% - ${(step - 1) * 96 + 48}px))`,
+              }}
+            >
+              <div className="flex px-4 w-fit space-x-8">
+                {steps.map((s) => (
+                  <div key={s.id} className="flex flex-col items-center w-16">
+                    <div
+                      className={`w-8 h-8 rounded-full border-2 flex items-center justify-center mb-1 text-sm
+                        ${s.id === step
+                          ? 'bg-blue-500 border-blue-500 text-white'
+                          : 'bg-white border-gray-300 text-gray-400'}`}
+                    >
+                      {s.id}
+                    </div>
+                    <span
+                      className={`text-sm text-center
+                        ${s.id === step ? 'text-blue-600 font-semibold' : 'text-gray-400'}`}
+                    >
+                      {s.label}
+                    </span>
                   </div>
-                  <span
-                    className={`text-sm text-center
-                      ${s.id === step ? 'text-blue-600 font-semibold' : 'text-gray-400'}`}
-                  >
-                    {s.label}
-                  </span>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
-        </div>
 
-        <form onSubmit={handleSubmit}>
-          {renderStepContent()}
-          <div className="flex justify-between mt-4">
-            {step > 1 && (
-              <button
-                type="button"
-                onClick={prevStep}
-                className="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400"
-              >
-                이전
-              </button>
-            )}
-            {step < steps.length ? (
-              <button
-                type="button"
-                onClick={nextStep}
-                className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600 ml-auto"
-              >
-                다음
-              </button>
-            ) : (
-              <button
-                type="submit"
-                className="px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600 ml-auto"
-              >
-                가입하기
-              </button>
-            )}
-          </div>
-        </form>
+          <form onSubmit={handleSubmit}>
+            {renderStepContent()}
+            <div className="flex justify-between mt-4">
+              {step > 1 && (
+                <button
+                  type="button"
+                  onClick={prevStep}
+                  className="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400"
+                >
+                  이전
+                </button>
+              )}
+              {step < steps.length ? (
+                <button
+                  type="button"
+                  onClick={nextStep}
+                  className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600 ml-auto"
+                >
+                  다음
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleSubmit}
+                  className="px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600 ml-auto"
+                >
+                  가입하기
+                </button>
+              )}
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );
