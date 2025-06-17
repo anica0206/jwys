@@ -10,6 +10,12 @@ const cors = require('cors');
 
 // app.use(cors());
 
+// 캐시 무효화
+app.use((req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store');
+  next();
+});
+
 app.use(cors({
     // origin: process.env.REACT_APP_API_URL || 'http://localhost:3000',
     origin: process.env.REACT_APP_FRONT_API_URL || 'http://134.185.112.116:3000',
@@ -26,5 +32,11 @@ app.use('/api/auth', authRoutes);
 
 const signUpRoutes = require('./routes/signUp');
 app.use('/api/signUp', signUpRoutes);
+
+const checkDupRoutes = require('./routes/checkId');
+app.use('/api/checkId', checkDupRoutes);
+
+const verifyEmailRoutes = require('./routes/verifyEmail');
+app.use('/api/verifyEmail', verifyEmailRoutes);
 
 app.listen(5000, () => console.log('Server running on port 5000'));
