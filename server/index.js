@@ -18,7 +18,7 @@ app.use((req, res, next) => {
 
 app.use(cors({
     // origin: process.env.REACT_APP_API_URL || 'http://localhost:3000',
-    origin: process.env.REACT_APP_FRONT_API_URL || 'http://134.185.112.116:3000',
+    origin: process.env.REACT_APP_FRONT_API_URL || 'http://134.185.112.116',
     credentials: false,
     allowedHeaders: ['Authorization', 'Content-Type']
   }));
