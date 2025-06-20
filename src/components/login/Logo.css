@@ -1,0 +1,11 @@
+.memo-with-logo-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px; /* 로고와 메모지 사이 간격 */
+  }
+  
+  .memo-logo {
+    width: 100px; /* 적당한 크기 */
+    height: auto;
+  }
