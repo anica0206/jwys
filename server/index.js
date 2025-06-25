@@ -39,4 +39,7 @@ app.use('/api/checkId', checkDupRoutes);
 const verifyEmailRoutes = require('./routes/verifyEmail');
 app.use('/api/verifyEmail', verifyEmailRoutes);
 
+const findAccountRoutes = require('./routes/findAccount');
+app.use('/api/findAccount', findAccountRoutes);
+
 app.listen(5000, () => console.log('Server running on port 5000'));

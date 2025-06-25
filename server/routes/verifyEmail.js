@@ -3,6 +3,7 @@ const nodemailer = require('nodemailer');
 // const redis = require('redis');
 const redisClient = require('../redisClient');
 const router = express.Router();
+require('dotenv').config();
 
 // const redisClient = redis.createClient();
 // redisClient.connect().catch(console.error);
@@ -11,8 +12,8 @@ const router = express.Router();
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'kjew03@gmail.com',
-    pass: 'nasc acdk ehfu wujj'
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
   }
 });
 
