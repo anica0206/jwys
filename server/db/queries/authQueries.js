@@ -1,9 +1,9 @@
 const db = require('../../dbRoutes');
 
-exports.getUser = async (id, password) => {
+exports.getUser = async (id) => {
     const result = await db.query(
-        'SELECT * FROM USERS WHERE ID = $1 AND PASSWORD = $2',
-        [id, password]
+        'SELECT * FROM USERSTB WHERE ID = $1',
+        [id]
     );
     return result.rows[0]; // 없으면 undefined
 };
