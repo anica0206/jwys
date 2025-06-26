@@ -34,7 +34,7 @@ const Login = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const API_BASE_URL = process.env.REACT_APP_BACK_API_URL || 'http://localhost:5000';
+  const API_BASE_URL = process.env.REACT_APP_BACK_API_URL || 'http://134.185.112.116:5000';
 
   const handleLogin = async () => {
     try {
