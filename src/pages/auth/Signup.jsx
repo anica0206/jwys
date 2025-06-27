@@ -2,16 +2,22 @@ import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { signUp } from '../../api/signUpApi';
 import { checkIdDuplicate } from '../../api/signUp/checkIdDuplicate';
+import { checkEmailDuplicate } from '../../api/signUp/checkEmailDuplicate';
 import { sendVerificationCode, verifyCode } from '../../api/verifyEmailApi';
 import DaumPostcode from 'react-daum-postcode';
 import Swal from 'sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
+import { Signal } from "lucide-react";
+import PrivacyAgreement from '../../components/signup/PrivacyAgreement';
+import Marketing from '../../components/signup/Marketing';
 
 const steps = [
-  { id: 1, label: '계정 설정' },
-  { id: 2, label: '이메일' },
-  { id: 3, label: '개인 정보' },
-  { id: 4, label: '연락처' },
+  { id: 1, label: '약관 동의' },
+  { id: 2, label: '계정 설정' },
+  { id: 3, label: '이메일' },
+  { id: 4, label: '개인 정보' },
+  { id: 5, label: '연락처' },
+  { id: 6, label: '마케팅 수신 동의' },
 ];
 
 const SignupModal = ({ onClose }) => {
@@ -24,20 +30,29 @@ const SignupModal = ({ onClose }) => {
     name: '',
     birth: '',
     sex: '',
-    nation: '',
+    nation: '0',
     phoneType: '',
     phone: '',
     address: '',
     addressDetail: '',
     postalCode: '',
+    emailAd: '',
+    smsAd: '',
   });
+
+  const [agreedPrivacy, setAgreedPrivacy] = useState(false);  // 약관 동의
   const [idChecked, setIdChecked] = useState(null);
   const [checkingId, setCheckingId] = useState(false);
   const [emailVerified, setEmailVerified] = useState(false);
+  const [emailLocked, setEmailLocked] = useState(false);
   const [inputCode, setInputCode] = useState('');
   const [sendingCode, setSendingCode] = useState(false);
   const [isPhoneTypeOpen, setIsPhoneTypeOpen] = useState(false); // 통신사
   const [isPostOpen, setIsPostOpen] = useState(false); // 주소 검색
+  const [isVerifyStep, setIsVerifyStep] = useState(false);
+
+  const idRegex = /^[a-z][a-z0-9]{5,}$/; // 아이디 규칙
+  const passwordRegex = /^(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*()_+~`{}[\]:;"'<>,.?/\\|=.-]).{10,}$/; // 비밀번호 규칙
 
   const phoneTypeOptions = [
     { label: 'SKT', value: '0' },
@@ -65,10 +80,12 @@ const SignupModal = ({ onClose }) => {
   };
 
   const isStepValid = () => {
-    if (step === 1) return formData.id && idChecked && formData.password && formData.confirmPassword && formData.password === formData.confirmPassword;
-    if (step === 2) return formData.email && isValidEmail(formData.email); // && emailVerified;
-    if (step === 3) return formData.name && formData.birth && isValidBirth(formData.birth) && formData.sex && formData.nation;
-    if (step === 4) return formData.phoneType && formData.phone && isValidPhone(formData.phone) && formData.address && formData.addressDetail && formData.postalCode;
+    if (step === 1) return agreedPrivacy;
+    if (step === 2) return formData.id && idChecked && formData.password && formData.confirmPassword && formData.password === formData.confirmPassword;
+    if (step === 3) return formData.email && isValidEmail(formData.email); // && emailVerified;
+    if (step === 4) return formData.name && formData.birth && isValidBirth(formData.birth) && formData.sex && formData.nation;
+    if (step === 5) return formData.phoneType && formData.phone && isValidPhone(formData.phone) && formData.address && formData.addressDetail && formData.postalCode;
+    if (step === 6) return formData.emailAd !== '' && formData.smsAd !== '';
     return false;
   };
 
@@ -80,12 +97,29 @@ const SignupModal = ({ onClose }) => {
                 text: '아이디를 입력하세요.',
                 confirmButtonText: '확인',
               });
+
+    if (!idRegex.test(formData.id.trim())) {
+      setCheckingId(false);
+      return Swal.fire({
+        icon: 'error',
+        title: '',
+        text: '영소문자로 시작하는 6자리 이상이어야 하며, 특수문자 사용은 불가능합니다.',
+        confirmButtonText: '확인',
+      });
+    }
+
     setCheckingId(true);
+
     try {
       const available = await checkIdDuplicate(formData.id);
       setIdChecked(available);
     } catch {
-      alert("중복 확인 중 오류 발생");
+        Swal.fire({
+          icon: 'error',
+          title: '중복 확인 중 오류 발생',
+          text: '관리자에게 문의하세요.',
+          confirmButtonText: '확인',
+        });
     } finally { setCheckingId(false); }
   };
 
@@ -100,10 +134,34 @@ const SignupModal = ({ onClose }) => {
     }
     setSendingCode(true);
     try {
+      // 이메일 중복 확인
+      const email = formData.email.trim();
+      const isDuplicate = await checkEmailDuplicate(email);
+      if (!isDuplicate) {
+        return Swal.fire({
+          icon: 'error',
+          title: '',
+          text: '이미 가입된 이메일입니다.',
+          confirmButtonText: '확인',
+        });
+      }
+
       await sendVerificationCode(formData.email);
-      alert("인증번호가 발송되었습니다.");
+      Swal.fire({
+        icon: 'success',
+        title: '',
+        text: '인증번호가 발송되었습니다.',
+        confirmButtonText: '확인',
+      });
+      setEmailLocked(true);
+      setIsVerifyStep(true);
     } catch {
-      alert("인증번호 발송 실패");
+        Swal.fire({
+          icon: 'error',
+          title: '인증번호 발송 실패',
+          text: '관리자에게 문의하세요.',
+          confirmButtonText: '확인',
+        });
     } finally { setSendingCode(false); }
   };
 
@@ -112,10 +170,20 @@ const SignupModal = ({ onClose }) => {
       const res = await verifyCode(formData.email, inputCode);
       if (res.message === '이메일 인증 성공') {
         setEmailVerified(true);
-        alert("이메일 인증 완료");
+        Swal.fire({
+          icon: 'success',
+          title: '',
+          text: '메일이 인증되었습니다.',
+          confirmButtonText: '확인',
+        });
       }
     } catch {
-      alert("인증 실패");
+      Swal.fire({
+        icon: 'error',
+        title: '',
+        text: '인증 실패!',
+        confirmButtonText: '확인',
+      });
     }
   };
 
@@ -160,16 +228,35 @@ const SignupModal = ({ onClose }) => {
   
     setIsPostOpen(false);
   };
+  
+  const toggleMarketingConsent = (type) => {
+    const key = type === 'email' ? 'emailAd' : 'smsAd';
+    setFormData((prev) => ({
+      ...prev,
+      [key]: prev[key] === 0 ? 1 : 0, // 0: 체크, 1: 체크 x
+    }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log(formData);
     try {
       await signUp(formData.id, formData.password, formData.email, formData.name, formData.birth, formData.sex, formData.nation,
-                   formData.phoneType, formData.phone, formData.address, formData.addressDetail, formData.postalCode);
-      alert('회원가입이 완료되었습니다.');
+                   formData.phoneType, formData.phone, formData.address, formData.addressDetail, formData.postalCode, formData.emailAd, formData.smsAd);
+      Swal.fire({
+        icon: 'success',
+        title: '회원가입 완료!',
+        text: `${formData.name}님, 환영합니다.`,
+        confirmButtonText: '확인',
+      });
       onClose();
     } catch {
-      alert('회원가입 실패. 관리자에게 문의하세요.');
+      Swal.fire({
+        icon: 'error',
+        title: '회원가입 실패',
+        text: '관리자에게 문의하세요.',
+        confirmButtonText: '확인',
+      });
     }
   };
 
@@ -180,36 +267,63 @@ const SignupModal = ({ onClose }) => {
     if (step === 1) {
       return (
         <>
+          <PrivacyAgreement
+            onAgree={agreedPrivacy}
+            onToggle={() => setAgreedPrivacy(prev => !prev)}
+          />
+        </>
+      );
+    }
+
+    if (step === 2) {
+      return (
+        <>
           <div className="flex items-center gap-2 mb-4">
             <input type="text" name="id" placeholder="아이디" value={formData.id}
               onChange={(e) => { handleChange(e); setIdChecked(null); }}
               className="flex-1 p-2 border rounded"
             />
-            <button type="button" onClick={handleCheckId} disabled={checkingId} className="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300">중복 확인</button>
+            <button type="button" onClick={handleCheckId} className="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300">중복 확인</button>
           </div>
           {idChecked === true && <p className="text-green-600 text-sm">사용 가능</p>}
           {idChecked === false && <p className="text-red-600 text-sm">사용 중인 아이디입니다.</p>}
           
           <input type="password" name="password" placeholder="비밀번호" value={formData.password}
             onChange={handleChange} className="w-full p-2 border rounded mb-4" />
+          {formData.password && !passwordRegex.test(formData.password) && (
+            <p className="text-red-500 text-sm mb-2">
+              비밀번호는 영소문자, 숫자, 특수문자를 포함해 10자리 이상이어야 합니다.
+            </p>
+          )}
           <input type="password" name="confirmPassword" placeholder="비밀번호 확인" value={formData.confirmPassword}
             onChange={handleChange} className="w-full p-2 border rounded mb-4" />
         </>
       );
     }
-    if (step === 2) {
+    if (step === 3) {
       return (
         <>
           <div className="flex items-center gap-2 mb-4">
-            <input type="email" name="email" placeholder="이메일" value={formData.email}
+            <input type="email" name="email" placeholder="이메일" value={formData.email} disabled={emailLocked}
               onChange={(e) => { handleChange(e); setEmailVerified(false); }}
-              className="flex-1 p-2 border rounded"
+              className="w-full p-2 border rounded mb-4 disabled:bg-gray-100 disabled:text-gray-500"
             />
-            <button type="button" onClick={sendVerificationCodeHandler} className="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300">인증번호 전송</button>
+            {!isVerifyStep && (
+              <button
+                type="button"
+                onClick={sendVerificationCodeHandler}
+                disabled={sendingCode}
+                className={`w-full p-2 rounded mb-2 ${
+                  sendingCode ? 'bg-gray-400 text-white' : 'bg-green-500 text-white hover:bg-green-600'
+                }`}
+              >
+              {sendingCode ? '메일 발송 중...' : '인증번호 전송'}
+              </button>
+            )}
           </div>
-          {!emailVerified && (
+          {!emailVerified && isVerifyStep && (
             <div className="flex items-center gap-2 mb-4">
-              <input type="text" placeholder="인증번호 입력" value={inputCode} onChange={(e) => setInputCode(e.target.value)} className="flex-1 p-2 border rounded" />
+              <input type="text" inputMode="numeric" placeholder="인증번호 입력" value={inputCode} onChange={(e) => setInputCode(e.target.value)} className="flex-1 p-2 border rounded" />
               <button type="button" onClick={verifyCodeHandler} className="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300">인증 확인</button>
             </div>
           )}
@@ -217,7 +331,7 @@ const SignupModal = ({ onClose }) => {
         </>
       );
     }
-    if (step === 3) {
+    if (step === 4) {
       return (
         <>
           <div className="mb-4">
@@ -234,6 +348,7 @@ const SignupModal = ({ onClose }) => {
           <div className="mb-4">
             <input
               type="text"
+              inputMode="numeric"
               name="birth"
               placeholder="생년월일 8자리"
               value={formatBirthInput(formData.birth)}
@@ -303,7 +418,7 @@ const SignupModal = ({ onClose }) => {
         </>
       );
     }
-    if (step === 4) {
+    if (step === 5) {
       return (
         <>
           {/* 통신사 선택 */}
@@ -315,7 +430,10 @@ const SignupModal = ({ onClose }) => {
                 formData.phoneType ? 'text-black' : 'text-gray-400'
               }`}
             >
-              {selectedPhoneTypeLabel}
+              <div className="flex items-center gap-2">
+                <Signal className="w-4 h-4 text-gray-500" />
+                <span>{selectedPhoneTypeLabel}</span>
+              </div>
               <svg
                 className={`ml-2 w-4 h-4 text-gray-500 transform transition-transform duration-300 ${
                   isPhoneTypeOpen ? 'rotate-180' : 'rotate-0'
@@ -397,17 +515,30 @@ const SignupModal = ({ onClose }) => {
             )}
           </div>
 
-          <div className="mb-4">
-            <input
-              type="text"
-              name="addressDetail"
-              placeholder="상세주소 입력"
-              value={formData.addressDetail || ''}
-              onChange={handleChange}
-              className="w-full p-2 border rounded mb-4"
-            />
-          </div>
+          {formData.address && (
+            <div className="mb-4">
+              <input
+                type="text"
+                name="addressDetail"
+                placeholder="상세주소 입력"
+                value={formData.addressDetail || ''}
+                onChange={handleChange}
+                className="w-full p-2 border rounded mb-4"
+              />
+            </div>
+          )}
         </>
+      );
+    }
+    if(step === 6) {
+      return (
+        <Marketing
+          emailAd={formData.emailAd}
+          smsAd={formData.smsAd}
+          onChange={(key, value) =>
+            setFormData((prev) => ({ ...prev, [key]: value }))
+          }
+        />
       );
     }
   };
@@ -418,37 +549,52 @@ const SignupModal = ({ onClose }) => {
         <button type="button" onClick={onClose} className="absolute top-3 right-3 text-gray-400 hover:text-black text-2xl">&times;</button>
 
         <div className="flex justify-center mb-8 mt-8 md:mt-0">
-          <div className="transition-transform duration-500"
-            style={{
-              transform: `translateX(calc(50% - ${(step - 1) * 96 + 48}px))`,
-            }}>
-            <div className="flex px-4 w-fit space-x-8">
-              {steps.map((s) => (
-                <div key={s.id} className="flex flex-col items-center w-16">
-                  <div
-                    className={`w-8 h-8 rounded-full border-2 flex items-center justify-center mb-1 text-sm
-                      ${s.id === step
-                        ? 'bg-blue-500 border-blue-500 text-white'
-                        : 'bg-white border-gray-300 text-gray-400'}`}>
-                    {s.id}
+          {/* Stepper 보기 영역 */}
+          <div className="w-full max-w-md overflow-hidden">
+            <div
+              className="transition-transform duration-500"
+              style={{
+                transform: `translateX(calc(50% - ${(step - 1) * 96 + 48}px))`,
+              }}
+            >
+              <div className="flex px-4 w-fit space-x-8">
+                {steps.map((s) => (
+                  <div key={s.id} className="flex flex-col items-center w-16 flex-shrink-0">
+                    <div
+                      className={`w-8 h-8 rounded-full border-2 flex items-center justify-center mb-1 text-sm
+                        ${s.id === step
+                          ? 'bg-blue-500 border-blue-500 text-white'
+                          : 'bg-white border-gray-300 text-gray-400'}`}
+                    >
+                      {s.id}
+                    </div>
+                    <span className={`text-sm text-center ${s.id === step ? 'text-blue-600 font-semibold' : 'text-gray-400'}`}>
+                      {s.label}
+                    </span>
                   </div>
-                  <span className={`text-sm text-center ${s.id === step ? 'text-blue-600 font-semibold' : 'text-gray-400'}`}>
-                    {s.label}
-                  </span>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form className="space-y-4">
           {renderStepContent()}
           <div className="flex justify-between pt-6">
             {step > 1 && <button type="button" onClick={prevStep} className="px-5 py-3 rounded bg-gray-300 hover:bg-gray-400 text-gray-700 font-medium">이전</button>}
             {step < steps.length ? (
               <button type="button" onClick={nextStep} disabled={!isStepValid()} className={`px-5 py-3 rounded ml-auto font-medium ${isStepValid() ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}>다음</button>
             ) : (
-              <button type="submit" disabled={!isStepValid()} className={`px-5 py-3 rounded ml-auto font-medium ${isStepValid() ? 'bg-green-500 text-white hover:bg-green-600' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}>가입하기</button>
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={!isStepValid()}
+                className={`px-5 py-3 rounded ml-auto font-medium ${
+                  isStepValid() ? 'bg-green-500 text-white hover:bg-green-600' : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                }`}
+              >
+                가입하기
+              </button>
             )}
           </div>
         </form>

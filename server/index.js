@@ -33,8 +33,8 @@ app.use('/api/auth', authRoutes);
 const signUpRoutes = require('./routes/signUp');
 app.use('/api/signUp', signUpRoutes);
 
-const checkDupRoutes = require('./routes/checkId');
-app.use('/api/checkId', checkDupRoutes);
+const checkDupRoutes = require('./routes/checkDup');
+app.use('/api/checkDup', checkDupRoutes);
 
 const verifyEmailRoutes = require('./routes/verifyEmail');
 app.use('/api/verifyEmail', verifyEmailRoutes);

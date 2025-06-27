@@ -3,7 +3,7 @@ const signUpQueries = require('../db/queries/signUpQueries');
 
 exports.signUp = async (req, res) => {
   try {
-    const { id, password, email, name, birth, sex, nation, phoneType, phone, address, addressDetail, postalCode } = req.body;
+    const { id, password, email, name, birth, sex, nation, phoneType, phone, address, addressDetail, postalCode, emailAd, smsAd } = req.body;
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -19,11 +19,14 @@ exports.signUp = async (req, res) => {
       phone,
       address,
       addressDetail,
-      postalCode
+      postalCode,
+      emailAd,
+      smsAd
     });
 
     res.status(201).json(newUser);
   } catch (err) {
+    console.error('회원가입 실패:', err);
     res.status(500).send(err.message);
   }
 };
