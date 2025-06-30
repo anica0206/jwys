@@ -44,4 +44,7 @@ app.use('/api/verifyEmail', verifyEmailRoutes);
 const findAccountRoutes = require('./routes/findAccount');
 app.use('/api/findAccount', findAccountRoutes);
 
-app.listen(5000, () => console.log('Server running on port 5000'));
+const scheduleRouter = require('./routes/schedule');
+app.use('/api/schedules', scheduleRouter);
+
+app.listen(5000, '0.0.0.0', () => console.log('Server running on port 5000'));
