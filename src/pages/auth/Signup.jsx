@@ -17,7 +17,7 @@ const steps = [
   { id: 3, label: '이메일' },
   { id: 4, label: '개인 정보' },
   { id: 5, label: '연락처' },
-  { id: 6, label: '마케팅 수신 동의' },
+  { id: 6, label: '마케팅' },
 ];
 
 const SignupModal = ({ onClose }) => {
@@ -82,7 +82,7 @@ const SignupModal = ({ onClose }) => {
   const isStepValid = () => {
     if (step === 1) return agreedPrivacy;
     if (step === 2) return formData.id && idChecked && formData.password && formData.confirmPassword && formData.password === formData.confirmPassword;
-    if (step === 3) return formData.email && isValidEmail(formData.email); // && emailVerified;
+    if (step === 3) return formData.email && isValidEmail(formData.email) && emailVerified;
     if (step === 4) return formData.name && formData.birth && isValidBirth(formData.birth) && formData.sex && formData.nation;
     if (step === 5) return formData.phoneType && formData.phone && isValidPhone(formData.phone) && formData.address && formData.addressDetail && formData.postalCode;
     if (step === 6) return formData.emailAd !== '' && formData.smsAd !== '';
@@ -111,7 +111,7 @@ const SignupModal = ({ onClose }) => {
     setCheckingId(true);
 
     try {
-      const available = await checkIdDuplicate(formData.id);
+      const available = await checkIdDuplicate(formData.id.trim());
       setIdChecked(available);
     } catch {
         Swal.fire({
@@ -124,7 +124,9 @@ const SignupModal = ({ onClose }) => {
   };
 
   const sendVerificationCodeHandler = async () => {
-    if (!isValidEmail(formData.email)) {
+    const email = formData.email.trim();
+
+    if (!isValidEmail(email)) {
       return Swal.fire({
         icon: 'warning',
         title: '',
@@ -135,7 +137,6 @@ const SignupModal = ({ onClose }) => {
     setSendingCode(true);
     try {
       // 이메일 중복 확인
-      const email = formData.email.trim();
       const isDuplicate = await checkEmailDuplicate(email);
       if (!isDuplicate) {
         return Swal.fire({
@@ -146,7 +147,7 @@ const SignupModal = ({ onClose }) => {
         });
       }
 
-      await sendVerificationCode(formData.email);
+      await sendVerificationCode(email);
       Swal.fire({
         icon: 'success',
         title: '',
@@ -155,7 +156,8 @@ const SignupModal = ({ onClose }) => {
       });
       setEmailLocked(true);
       setIsVerifyStep(true);
-    } catch {
+    } catch (error) {
+        console.error('인증번호 발송 오류:', error);
         Swal.fire({
           icon: 'error',
           title: '인증번호 발송 실패',
@@ -304,20 +306,28 @@ const SignupModal = ({ onClose }) => {
       return (
         <>
           <div className="flex items-center gap-2 mb-4">
-            <input type="email" name="email" placeholder="이메일" value={formData.email} disabled={emailLocked}
-              onChange={(e) => { handleChange(e); setEmailVerified(false); }}
-              className="w-full p-2 border rounded mb-4 disabled:bg-gray-100 disabled:text-gray-500"
+            <input
+              type="email"
+              name="email"
+              placeholder="이메일"
+              value={formData.email}
+              disabled={emailLocked}
+              onChange={(e) => {
+                handleChange(e);
+                setEmailVerified(false);
+              }}
+              className="flex-grow p-2 border rounded disabled:bg-gray-100 disabled:text-gray-500"
             />
             {!isVerifyStep && (
               <button
                 type="button"
                 onClick={sendVerificationCodeHandler}
                 disabled={sendingCode}
-                className={`w-full p-2 rounded mb-2 ${
+                className={`w-32 p-2 rounded ${
                   sendingCode ? 'bg-gray-400 text-white' : 'bg-green-500 text-white hover:bg-green-600'
                 }`}
               >
-              {sendingCode ? '메일 발송 중...' : '인증번호 전송'}
+                {sendingCode ? '메일 발송 중...' : '인증번호 전송'}
               </button>
             )}
           </div>
