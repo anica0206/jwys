@@ -3,7 +3,7 @@ const nodemailer = require('nodemailer');
 // const redis = require('redis');
 const redisClient = require('../redisClient');
 const router = express.Router();
-require('dotenv').config();
+// require('dotenv').config();
 
 // const redisClient = redis.createClient();
 // redisClient.connect().catch(console.error);
@@ -20,6 +20,10 @@ const transporter = nodemailer.createTransport({
 // 인증번호 발송
 router.post('/sendVerificationCode', async (req, res) => {
   const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ message: '이메일이 없습니다.' });
+  }
 
   const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -47,6 +51,8 @@ router.post('/sendVerificationCode', async (req, res) => {
     res.json({ message: '인증번호가 발송되었습니다.' });
   } catch (err) {
     console.error(err);
+    console.log('EMAIL_USER:', process.env.EMAIL_USER);
+    console.log('EMAIL_PASS:', process.env.EMAIL_PASS);
     res.status(500).json({ message: '이메일 발송 실패' });
   }
 });
