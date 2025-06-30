@@ -158,6 +158,8 @@ const SignupModal = ({ onClose }) => {
       setIsVerifyStep(true);
     } catch (error) {
         console.error('인증번호 발송 오류:', error);
+        console.log('EMAIL_USER:', process.env.EMAIL_USER);
+        console.log('EMAIL_PASS:', process.env.EMAIL_PASS);
         Swal.fire({
           icon: 'error',
           title: '인증번호 발송 실패',
