@@ -3,6 +3,8 @@ require('dotenv').config();
 console.log('DB_PASS from env:', process.env.DB_PASS);
 console.log('DB_USER:', process.env.DB_USER);
 console.log('DB_PASS:', process.env.DB_PASS);
+console.log('EMAIL_USER:', process.env.EMAIL_USER);
+console.log('EMAIL_PASS:', process.env.EMAIL_PASS);
 
 const express = require('express');
 const app = express();
