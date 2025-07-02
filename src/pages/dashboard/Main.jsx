@@ -107,7 +107,6 @@ const MainPage = () => {
                 </div>
                 <ul className="p-4 space-y-2">
                     <li className="hover:bg-gray-100 p-2 rounded cursor-pointer">일정 추가</li>
-                    <li className="hover:bg-gray-100 p-2 rounded cursor-pointer">내 정보</li>
                 </ul>
             </div>
         
@@ -130,7 +129,6 @@ const MainPage = () => {
                     >
                         <Menu className="w-6 h-6" />
                     </button>
-                    <h1 className="text-2xl font-bold text-center flex-1 -ml-6">메인 페이지</h1>
                 </div>
         
                 {/* 달력 */}
