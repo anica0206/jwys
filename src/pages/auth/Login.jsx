@@ -46,7 +46,7 @@ const Login = () => {
       } else {
         localStorage.removeItem('id');
       }
-      navigate('/dashboard');
+      navigate('/report');
     } catch (err) {
       console.error('로그인 실패:', err?.response?.data?.message || err.message);
       Swal.fire({
