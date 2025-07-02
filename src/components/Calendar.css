@@ -1,0 +1,73 @@
+/* FullCalendar 파스텔 스타일 커스터마이징 */
+
+.fc {
+    --fc-button-bg-color: #fcecc9;
+    --fc-button-text-color: #5c3d2e;
+    --fc-button-hover-bg-color: #fbd98b;
+    --fc-border-color: #f4e5c3;
+    --fc-today-bg-color: #faedcd;
+    --fc-event-bg-color: #f6c28b;
+    --fc-event-text-color: #3e2e1e;
+    --fc-page-bg-color: #fffaf3;
+  }
+  
+  /* 전체 배경 */
+  .fc .fc-scrollgrid {
+    background-color: var(--fc-page-bg-color);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.05);
+  }
+  
+  /* 헤더 테두리 및 셀 */
+  .fc-theme-standard td,
+  .fc-theme-standard th {
+    border: 1px solid var(--fc-border-color);
+  }
+  
+  /* 툴바 제목 */
+  .fc .fc-toolbar-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #a47148;
+  }
+  
+  /* 상단 버튼 */
+  .fc .fc-button {
+    background-color: var(--fc-button-bg-color) !important;
+    color: var(--fc-button-text-color) !important;
+    border: none;
+    border-radius: 10px;
+    padding: 6px 14px;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transition: all 0.2s;
+  }
+  .fc .fc-button:hover {
+    background-color: var(--fc-button-hover-bg-color) !important;
+  }
+  
+  /* 요일 헤더 */
+  .fc .fc-col-header-cell-cushion {
+    color: #7b5e43;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  
+  /* 오늘 날짜 강조 */
+  .fc .fc-daygrid-day.fc-day-today {
+    background-color: var(--fc-today-bg-color);
+  }
+  
+  /* 이벤트 카드 */
+  .fc .fc-event {
+    background-color: var(--fc-event-bg-color) !important;
+    color: var(--fc-event-text-color) !important;
+    border: none;
+    border-radius: 8px;
+    font-size: 12px;
+    padding: 2px 6px;
+    margin: 2px 0;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+  
