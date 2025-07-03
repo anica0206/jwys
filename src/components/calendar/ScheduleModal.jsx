@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { fetchSchedules, saveSchedule, getScheduleById, updateSchedule} from '../api/scheduleApi';
+import { fetchSchedules, saveSchedule, getScheduleById, updateSchedule} from '../../api/scheduleApi';
 
 const ScheduleModal = ({ userId, onClose, onSave, startDate, initialData }) => {
     const isEditMode = !!initialData;

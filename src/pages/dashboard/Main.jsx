@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useUser } from '../../context/UserContext';
-import Calendar from '../../components/Calendar'; // Calendar 컴포넌트 import
-import ScheduleModal from '../../components/ScheduleModal';  // 아까 만든 팝업 import
+import Calendar from '../../components/calendar/Calendar'; // Calendar 컴포넌트 import
+import ScheduleModal from '../../components/calendar/ScheduleModal';  // 아까 만든 팝업 import
 import { fetchSchedules, saveSchedule, getScheduleById } from '../../api/scheduleApi';
 import { Menu } from 'lucide-react'; // 햄버거 메뉴 아이콘
 import { ChevronLeft } from 'lucide-react';
