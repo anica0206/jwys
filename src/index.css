@@ -4,8 +4,8 @@
 
 @layer utilities {
   .path-hidden {
-    stroke-dasharray: 100;
-    stroke-dashoffset: 100;
+    stroke-dasharray: 24;
+    stroke-dashoffset: 24;
   }
 }
 

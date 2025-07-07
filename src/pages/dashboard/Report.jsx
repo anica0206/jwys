@@ -3,6 +3,7 @@ import { useUser } from '../../context/UserContext';
 import { fetchSchedules } from '../../api/scheduleApi';
 import { useNavigate } from 'react-router-dom';
 import WeeklyCalendar from '../../components/calendar/WeeklyCalendar';
+import '../../index.css'
 
 const Report = () => {
   const { user } = useUser();
@@ -15,6 +16,9 @@ const Report = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   // 지난 일정 보기
   const [showPast, setShowPast] = useState(false);
+
+  // 오늘 일정 완료 체크
+  const [checked, setChecked] = useState(false);
 
   const showCal = () => {
       navigate('/main');
@@ -120,56 +124,56 @@ const Report = () => {
   const grouped = groupByDayAndTime(filtered);
 
   const isSameDate = (d1, d2) =>
-      d1.getFullYear() === d2.getFullYear() &&
-      d1.getMonth() === d2.getMonth() &&
-      d1.getDate() === d2.getDate();
+    d1.getFullYear() === d2.getFullYear() &&
+    d1.getMonth() === d2.getMonth() &&
+    d1.getDate() === d2.getDate();
 
-      const filterEvents = (events, date) => {
-        const today = events.filter(e =>
-          isSameDate(new Date(e.start_date), date)
-        );
-        // const start = new Date(date);
-        // const end = new Date(date);
-        // end.setDate(start.getDate() + 6);
-      
-        const daysKor = ['일', '월', '화', '수', '목', '금', '토'];
-      
-        const { start, end } = getWeekRange(selectedDate);
+  const filterEvents = (events, date) => {
+    const today = events.filter(e =>
+      isSameDate(new Date(e.start_date), date)
+    );
+    // const start = new Date(date);
+    // const end = new Date(date);
+    // end.setDate(start.getDate() + 6);
+  
+    const daysKor = ['일', '월', '화', '수', '목', '금', '토'];
+  
+    const { start, end } = getWeekRange(selectedDate);
 
-        const week = events
-        .filter(e => {
-          const d = toLocalDate(e.start_date);
-          return d >= toLocalDate(start) && d <= toLocalDate(end);
-        })
-        .map(e => {
-          const d = new Date(e.start_date);
-          return {
-            ...e,
-            day: daysKor[d.getDay()],
-            dateStr: getDateOnly(e.start_date),
-            timeStr: e.start_time?.slice(0, 5) || '',
-          };
-        })
-        // 날짜 기준 정렬 (일~토 순서 유지됨)
-        .sort((a, b) => new Date(a.dateStr) - new Date(b.dateStr));
-      
-        return { today, week };
+    const week = events
+    .filter(e => {
+      const d = toLocalDate(e.start_date);
+      return d >= toLocalDate(start) && d <= toLocalDate(end);
+    })
+    .map(e => {
+      const d = new Date(e.start_date);
+      return {
+        ...e,
+        day: daysKor[d.getDay()],
+        dateStr: getDateOnly(e.start_date),
+        timeStr: e.start_time?.slice(0, 5) || '',
       };
+    })
+    // 날짜 기준 정렬 (일~토 순서 유지됨)
+    .sort((a, b) => new Date(a.dateStr) - new Date(b.dateStr));
+  
+    return { today, week };
+  };
 
-      useEffect(() => {
-        const load = async () => {
-          if (!user?.id) return;
-      
-          const events = await fetchSchedules(user.id);
-          setAllEvents(events);
-      
-          const { today, week } = filterEvents(events, selectedDate);
-          setTodayEvents(today);
-          setWeeklyEvents(week);
-        };
-      
-        load();
-      }, [user?.id, selectedDate]);
+  useEffect(() => {
+    const load = async () => {
+      if (!user?.id) return;
+  
+      const events = await fetchSchedules(user.id);
+      setAllEvents(events);
+  
+      const { today, week } = filterEvents(events, selectedDate);
+      setTodayEvents(today);
+      setWeeklyEvents(week);
+    };
+  
+    load();
+  }, [user?.id, selectedDate]);
 
   return (
     <div className="min-h-screen bg-[#fffaf3] p-4 sm:p-6">
@@ -219,27 +223,27 @@ const Report = () => {
                     </div>
 
                     {/* 체크박스 */}
-                    <label className="relative w-6 h-6">
+                    <label className="relative w-6 h-6 inline-block cursor-pointer">
                       {/* 숨긴 체크박스 */}
                       <input
                         type="checkbox"
-                        checked={e.is_done}
-                        onChange={() => console.log('체크')}
+                        checked={checked}
+                        onChange={() => setChecked(!checked)}
                         className="peer sr-only"
                       />
 
-                      {/* 바깥 박스 */}
-                      <div className="absolute inset-0 rounded-md border-2 border-yellow-500"></div>
+                      {/* 테두리 - 체크되면 숨김 */}
+                      <div className="absolute inset-0 rounded-md border-2 border-yellow-500 peer-checked:hidden"></div>
 
-                      {/* 체크 아이콘 (선이 그려지는 애니메이션) */}
+                      {/* 체크 아이콘 - 체크 시만 표시 */}
                       <svg
-                        className="absolute top-0 left-0 w-6 h-6 text-yellow-500 pointer-events-none"
+                        className="absolute top-0 left-0 w-6 h-6 text-yellow-500 hidden peer-checked:block pointer-events-none"
                         viewBox="0 0 24 24"
                         fill="none"
                       >
                         <path
                           d="M5 13L9 17L19 7"
-                          className="stroke-current stroke-[3] stroke-yellow-500 path-hidden peer-checked:animate-draw"
+                          className="stroke-current stroke-[3]"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
